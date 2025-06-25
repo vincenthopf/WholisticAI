@@ -6,8 +6,10 @@ import {
 } from "@/components/prompt-kit/message"
 import { useUserPreferences } from "@/lib/user-preference-store/provider"
 import { cn } from "@/lib/utils"
+import { extractThinkingContent, extractThinkingContentStreaming } from "@/lib/utils/extract-thinking"
 import type { Message as MessageAISDK } from "@ai-sdk/react"
 import { ArrowClockwise, Check, Copy } from "@phosphor-icons/react"
+import { useMemo } from "react"
 import { getSources } from "./get-sources"
 import { Reasoning } from "./reasoning"
 import { SearchImages } from "./search-images"
@@ -43,7 +45,29 @@ export function MessageAssistant({
     (part) => part.type === "tool-invocation"
   )
   const reasoningParts = parts?.find((part) => part.type === "reasoning")
-  const contentNullOrEmpty = children === null || children === ""
+  
+  // Extract thinking content from the message
+  const { cleanedText, thinkingContent } = useMemo(() => {
+    if (typeof children === "string" && children) {
+      // Use streaming-aware extraction when streaming
+      if (status === "streaming") {
+        return extractThinkingContentStreaming(children)
+      }
+      return extractThinkingContent(children)
+    }
+    return { cleanedText: children || "", thinkingContent: null }
+  }, [children, status])
+  
+  // Combine native reasoning with extracted thinking
+  const combinedReasoning = useMemo(() => {
+    const nativeReasoning = (reasoningParts as any)?.reasoning
+    if (nativeReasoning && thinkingContent) {
+      return nativeReasoning + "\n\n" + thinkingContent
+    }
+    return nativeReasoning || thinkingContent
+  }, [reasoningParts, thinkingContent])
+  
+  const contentNullOrEmpty = cleanedText === null || cleanedText === ""
   const isLastStreaming = status === "streaming" && isLast
   const searchImageResults =
     parts
@@ -72,9 +96,9 @@ export function MessageAssistant({
       )}
     >
       <div className={cn("flex min-w-full flex-col gap-2", isLast && "pb-8")}>
-        {reasoningParts && reasoningParts.reasoning && (
+        {combinedReasoning && (
           <Reasoning
-            reasoning={reasoningParts.reasoning}
+            reasoning={combinedReasoning}
             isStreaming={status === "streaming"}
           />
         )}
@@ -97,7 +121,7 @@ export function MessageAssistant({
             )}
             markdown={true}
           >
-            {children}
+            {cleanedText || children || ""}
           </MessageContent>
         )}
 

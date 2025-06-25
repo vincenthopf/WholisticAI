@@ -63,7 +63,19 @@ async function detectOllamaModels(): Promise<ModelConfig[]> {
       return []
     }
 
-    const data: OllamaListResponse = await response.json()
+    let data: OllamaListResponse
+    try {
+      data = await response.json()
+    } catch (jsonError) {
+      console.warn('Failed to parse Ollama API response:', jsonError)
+      return []
+    }
+
+    // Validate response structure
+    if (!data || !Array.isArray(data.models)) {
+      console.warn('Invalid response from Ollama API: missing models array', data)
+      return []
+    }
 
     return data.models.map((model): ModelConfig => {
       // Extract model family and size info
@@ -105,8 +117,7 @@ async function detectOllamaModels(): Promise<ModelConfig[]> {
         website: "https://ollama.com",
         apiDocs: "https://github.com/ollama/ollama/blob/main/docs/api.md",
         modelPage: `https://ollama.com/library/${modelName.split(":")[0]}`,
-        apiSdk: (apiKey?: string) =>
-          openproviders(modelName as string, undefined, apiKey),
+        apiSdk: (apiKey?: string) => openproviders(modelName as string, undefined, apiKey),
       }
     })
   } catch (error) {
@@ -288,8 +299,7 @@ const staticOllamaModels: ModelConfig[] = [
     website: "https://ollama.com",
     apiDocs: "https://github.com/ollama/ollama/blob/main/docs/api.md",
     modelPage: "https://ollama.com/library/llama3.2",
-    apiSdk: (apiKey?: string) =>
-      openproviders("llama3.2:latest" as string, undefined, apiKey),
+    apiSdk: (apiKey?: string) => openproviders("llama3.2:latest" as string, undefined, apiKey),
   },
   {
     id: "qwen2.5-coder:latest",
@@ -315,8 +325,7 @@ const staticOllamaModels: ModelConfig[] = [
     website: "https://ollama.com",
     apiDocs: "https://github.com/ollama/ollama/blob/main/docs/api.md",
     modelPage: "https://ollama.com/library/qwen2.5-coder",
-    apiSdk: (apiKey?: string) =>
-      openproviders("qwen2.5-coder:latest" as string, undefined, apiKey),
+    apiSdk: (apiKey?: string) => openproviders("qwen2.5-coder:latest" as string, undefined, apiKey),
   },
 ]
 

@@ -65,7 +65,16 @@ export async function GET() {
       })
     }
 
-    const models = await getModelsForUserProviders(userProviders)
+    // Always include local providers (LM Studio, Ollama) along with user's providers
+    const providersToInclude = [...userProviders]
+    if (!providersToInclude.includes("lm-studio")) {
+      providersToInclude.push("lm-studio")
+    }
+    if (!providersToInclude.includes("ollama")) {
+      providersToInclude.push("ollama")
+    }
+
+    const models = await getModelsForUserProviders(providersToInclude)
 
     return new Response(JSON.stringify({ models }), {
       status: 200,

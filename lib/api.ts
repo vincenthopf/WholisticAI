@@ -100,13 +100,64 @@ export async function updateChatModel(chatId: string, model: string) {
 }
 
 /**
- * Signs in user with Google OAuth via Supabase
+ * Signs in user with email and password via Supabase
  */
-export async function signInWithGoogle(supabase: SupabaseClient) {
+export async function signInWithEmail(
+  supabase: SupabaseClient,
+  email: string,
+  password: string
+) {
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+
+    if (error) {
+      throw error
+    }
+
+    return { data, error: null }
+  } catch (err) {
+    console.error("Error signing in with email:", err)
+    return { data: null, error: err }
+  }
+}
+
+/**
+ * Signs up user with email and password via Supabase
+ */
+export async function signUpWithEmail(
+  supabase: SupabaseClient,
+  email: string,
+  password: string
+) {
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    })
+
+    if (error) {
+      throw error
+    }
+
+    return { data, error: null }
+  } catch (err) {
+    console.error("Error signing up with email:", err)
+    return { data: null, error: err }
+  }
+}
+
+/**
+ * Sends a password reset email via Supabase
+ */
+export async function resetPassword(
+  supabase: SupabaseClient,
+  email: string
+) {
   try {
     const isDev = process.env.NODE_ENV === "development"
-
-    // Get base URL dynamically (will work in both browser and server environments)
     const baseUrl = isDev
       ? "http://localhost:3000"
       : typeof window !== "undefined"
@@ -115,26 +166,41 @@ export async function signInWithGoogle(supabase: SupabaseClient) {
           ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
           : APP_DOMAIN
 
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${baseUrl}/auth/callback`,
-        queryParams: {
-          access_type: "offline",
-          prompt: "consent",
-        },
-      },
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${baseUrl}/auth/reset-password/update`,
     })
 
     if (error) {
       throw error
     }
 
-    // Return the provider URL
-    return data
+    return { data, error: null }
   } catch (err) {
-    console.error("Error signing in with Google:", err)
-    throw err
+    console.error("Error sending password reset email:", err)
+    return { data: null, error: err }
+  }
+}
+
+/**
+ * Updates user password via Supabase
+ */
+export async function updatePassword(
+  supabase: SupabaseClient,
+  newPassword: string
+) {
+  try {
+    const { data, error } = await supabase.auth.updateUser({
+      password: newPassword,
+    })
+
+    if (error) {
+      throw error
+    }
+
+    return { data, error: null }
+  } catch (err) {
+    console.error("Error updating password:", err)
+    return { data: null, error: err }
   }
 }
 

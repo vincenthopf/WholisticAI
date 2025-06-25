@@ -11,6 +11,7 @@ import OpenAI from "@/components/icons/openai"
 import OpenRouter from "@/components/icons/openrouter"
 import Preplexity from "@/components/icons/perplexity"
 import Xai from "@/components/icons/xai"
+import { WellnessIcon } from "@/components/icons/wellness"
 
 export type Provider = {
   id: string
@@ -20,6 +21,12 @@ export type Provider = {
 }
 
 export const PROVIDERS: Provider[] = [
+  {
+    id: "lm-studio",
+    name: "LM Studio (Local)",
+    icon: WellnessIcon,
+    available: true,
+  },
   {
     id: "openrouter",
     name: "OpenRouter",

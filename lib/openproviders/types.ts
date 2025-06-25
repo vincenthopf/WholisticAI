@@ -127,6 +127,12 @@ export type StaticOllamaModel = "llama3.2:latest" | "qwen2.5-coder:latest"
 // Dynamic Ollama model type - allows any string for auto-detected models
 export type OllamaModel = StaticOllamaModel | (string & {})
 
+// LM Studio models
+export type LMStudioModel = 
+  | "lm-studio:OpenBioLLM-8B"
+  | "lm-studio:custom"
+  | (string & {}) // Allow dynamic models
+
 export type Provider =
   | "openai"
   | "mistral"
@@ -136,6 +142,7 @@ export type Provider =
   | "xai"
   | "ollama"
   | "openrouter"
+  | "lm-studio"
 
 export type SupportedModel =
   | OpenAIModel
@@ -146,3 +153,4 @@ export type SupportedModel =
   | XaiModel
   | OllamaModel
   | OpenRouterModel
+  | LMStudioModel

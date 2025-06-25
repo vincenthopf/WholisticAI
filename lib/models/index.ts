@@ -8,10 +8,12 @@ import { getOllamaModels, ollamaModels } from "./data/ollama"
 import { openaiModels } from "./data/openai"
 import { openrouterModels } from "./data/openrouter"
 import { perplexityModels } from "./data/perplexity"
+import { getLMStudioModels, lmStudioModels } from "./data/lmstudio"
 import { ModelConfig } from "./types"
 
 // Static models (always available)
 const STATIC_MODELS: ModelConfig[] = [
+  ...lmStudioModels, // Local medical models first
   ...openaiModels,
   ...mistralModels,
   ...deepseekModels,
@@ -38,15 +40,22 @@ export async function getAllModels(): Promise<ModelConfig[]> {
   }
 
   try {
-    // Get dynamically detected Ollama models (includes enabled check internally)
-    const detectedOllamaModels = await getOllamaModels()
+    // Get dynamically detected models
+    const [detectedOllamaModels, detectedLMStudioModels] = await Promise.all([
+      getOllamaModels(),
+      getLMStudioModels()
+    ])
 
-    // Combine static models (excluding static Ollama models) with detected ones
-    const staticModelsWithoutOllama = STATIC_MODELS.filter(
-      (model) => model.providerId !== "ollama"
+    // Combine static models (excluding static Ollama and LM Studio models) with detected ones
+    const staticModelsWithoutDynamic = STATIC_MODELS.filter(
+      (model) => model.providerId !== "ollama" && model.providerId !== "lm-studio"
     )
 
-    dynamicModelsCache = [...staticModelsWithoutOllama, ...detectedOllamaModels]
+    dynamicModelsCache = [
+      ...detectedLMStudioModels, // Medical models first
+      ...staticModelsWithoutDynamic, 
+      ...detectedOllamaModels
+    ]
 
     lastFetchTime = now
     return dynamicModelsCache
@@ -62,7 +71,9 @@ export async function getModelsWithAccessFlags(): Promise<ModelConfig[]> {
   const freeModels = models
     .filter(
       (model) =>
-        FREE_MODELS_IDS.includes(model.id) || model.providerId === "ollama"
+        FREE_MODELS_IDS.includes(model.id) || 
+        model.providerId === "ollama" ||
+        model.providerId === "lm-studio"
     )
     .map((model) => ({
       ...model,
@@ -82,7 +93,7 @@ export async function getModelsWithAccessFlags(): Promise<ModelConfig[]> {
 export async function getModelsForProvider(
   provider: string
 ): Promise<ModelConfig[]> {
-  const models = STATIC_MODELS
+  const models = await getAllModels() // Use getAllModels to include dynamic models
 
   const providerModels = models
     .filter((model) => model.providerId === provider)

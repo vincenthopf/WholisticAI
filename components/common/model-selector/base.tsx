@@ -129,7 +129,12 @@ export function ModelSelector({
   const filteredModels = models
     .filter((model) => !isModelHidden(model.id))
     .filter((model) => {
-      // If user has favorite models, only show favorites
+      // Always show local models (LM Studio and Ollama) - they're free and private
+      if (model.providerId === "lm-studio" || model.providerId === "ollama") {
+        return true
+      }
+      
+      // If user has favorite models, only show favorites for cloud models
       if (favoriteModels && favoriteModels.length > 0) {
         return favoriteModels.includes(model.id)
       }

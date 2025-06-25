@@ -1,5 +1,5 @@
 {
-  "name": "zola",
+  "name": "wholisticai",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "echo 'Tests coming in Stage 1C'",
+    "test:health": "curl http://localhost:3000/api/health/lm-studio",
+    "test:lm-studio": "curl http://localhost:1234/v1/models",
+    "setup:check": "node -e \"console.log('Node:', process.version); console.log('Environment:', process.env.NODE_ENV || 'development')\""
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^1.2.10",

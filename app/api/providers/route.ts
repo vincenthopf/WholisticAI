@@ -21,8 +21,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Skip Ollama since it doesn't use API keys
-    if (provider === "ollama") {
+    // Skip Ollama and LM Studio since they don't use API keys
+    if (provider === "ollama" || provider === "lm-studio") {
       return NextResponse.json({
         hasUserKey: false,
         provider,

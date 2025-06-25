@@ -5,9 +5,10 @@ import { AppInfoTrigger } from "@/app/components/layout/app-info/app-info-trigge
 import { ButtonNewChat } from "@/app/components/layout/button-new-chat"
 import { UserMenu } from "@/app/components/layout/user-menu"
 import { useBreakpoint } from "@/app/hooks/use-breakpoint"
-import { ZolaIcon } from "@/components/icons/zola"
+import { WellnessIcon } from "@/components/icons/wellness"
 import { Button } from "@/components/ui/button"
 import { APP_NAME } from "@/lib/config"
+import { Badge } from "@/components/ui/badge"
 import { useUser } from "@/lib/user-store/provider"
 import { Info } from "@phosphor-icons/react"
 import Link from "next/link"
@@ -28,10 +29,11 @@ export function Header({ hasSidebar }: { hasSidebar: boolean }) {
             <div className="flex flex-1 items-center gap-2">
               <Link
                 href="/"
-                className="pointer-events-auto inline-flex items-center text-xl font-medium tracking-tight"
+                className="pointer-events-auto inline-flex items-center gap-2 text-xl font-medium tracking-tight"
               >
-                <ZolaIcon className="mr-1 size-4" />
-                {APP_NAME}
+                <WellnessIcon className="size-5 text-emerald-600" />
+                <span>{APP_NAME}</span>
+                <Badge variant="secondary" className="text-xs">Beta</Badge>
               </Link>
               {hasSidebar && isMobile && <HeaderSidebarTrigger />}
             </div>

@@ -14,6 +14,7 @@ import { getUserProfile } from "@/lib/user/api"
 import { ThemeProvider } from "next-themes"
 import Script from "next/script"
 import { LayoutClient } from "./layout-client"
+import { MedicalDisclaimerModal } from "@/app/components/medical/disclaimer-modal"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,9 +27,16 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Zola",
+  title: "WholisticAI Beta - Your Private Health Assistant",
   description:
-    "Zola is the open-source interface for AI chat. Multi-model, BYOK-ready, and fully self-hostable. Use Claude, OpenAI, Gemini, local models, and more, all in one place.",
+    "WholisticAI is a secure, privacy-first health information assistant. Get reliable health guidance using local AI models with complete data privacy. For educational purposes only - not medical advice.",
+  keywords: "health AI, medical information, wellness assistant, private health chat, local AI",
+  authors: [{ name: "WholisticAI Team" }],
+  openGraph: {
+    title: "WholisticAI - Private Health Assistant",
+    description: "Secure, AI-powered health information and guidance",
+    type: "website",
+  },
 }
 
 export default async function RootLayout({
@@ -70,6 +78,7 @@ export default async function RootLayout({
                       >
                         <SidebarProvider defaultOpen>
                           <Toaster position="top-center" />
+                          <MedicalDisclaimerModal />
                           {children}
                         </SidebarProvider>
                       </ThemeProvider>

@@ -1,8 +1,25 @@
 import { updateSession } from "@/utils/supabase/middleware"
 import { NextResponse, type NextRequest } from "next/server"
 import { validateCsrfToken } from "./lib/csrf"
+import { 
+  securityMiddleware, 
+  rateLimitMiddleware, 
+  sessionTimeoutMiddleware,
+  medicalModeMiddleware,
+  applySecurityHeaders,
+  logAuditEvent 
+} from "./middleware/security"
 
 export async function middleware(request: NextRequest) {
+  const pathname = new URL(request.url).pathname;
+  
+  // Apply security middleware first (includes rate limiting, session timeout, etc.)
+  const securityResponse = await securityMiddleware(request);
+  if (securityResponse.status !== 200) {
+    return securityResponse;
+  }
+
+  // Update Supabase session
   const response = await updateSession(request)
 
   // CSRF protection for state-changing requests
@@ -11,24 +28,22 @@ export async function middleware(request: NextRequest) {
     const headerToken = request.headers.get("x-csrf-token")
 
     if (!csrfCookie || !headerToken || !validateCsrfToken(headerToken)) {
+      // Log CSRF failure for security monitoring
+      await logAuditEvent(
+        request.headers.get('x-user-id'),
+        'csrf_validation_failed',
+        'request',
+        pathname,
+        request,
+        { method: request.method }
+      );
+      
       return new NextResponse("Invalid CSRF token", { status: 403 })
     }
   }
 
-  // CSP for development and production
-  const isDev = process.env.NODE_ENV === "development"
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseDomain = supabaseUrl ? new URL(supabaseUrl).origin : ""
-
-  response.headers.set(
-    "Content-Security-Policy",
-    isDev
-      ? `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; connect-src 'self' wss: https://api.openai.com https://api.mistral.ai https://api.supabase.com ${supabaseDomain} https://api.github.com;`
-      : `default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://analytics.umami.is https://vercel.live; frame-src 'self' https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; connect-src 'self' wss: https://api.openai.com https://api.mistral.ai https://api.supabase.com ${supabaseDomain} https://api-gateway.umami.dev https://api.github.com;`
-  )
-
-  return response
+  // Apply all security headers to the response
+  return applySecurityHeaders(response);
 }
 
 export const config = {

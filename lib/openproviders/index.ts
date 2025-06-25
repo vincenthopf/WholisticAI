@@ -15,6 +15,7 @@ import type {
   PerplexityModel,
   SupportedModel,
   XaiModel,
+  LMStudioModel,
 } from "./types"
 
 type OpenAIChatSettings = Parameters<typeof openai>[1]
@@ -24,6 +25,7 @@ type PerplexityProviderSettings = Parameters<typeof perplexity>[0]
 type AnthropicProviderSettings = Parameters<typeof anthropic>[1]
 type XaiProviderSettings = Parameters<typeof xai>[1]
 type OllamaProviderSettings = OpenAIChatSettings // Ollama uses OpenAI-compatible API
+type LMStudioProviderSettings = OpenAIChatSettings // LM Studio uses OpenAI-compatible API
 
 type ModelSettings<T extends SupportedModel> = T extends OpenAIModel
   ? OpenAIChatSettings
@@ -39,7 +41,9 @@ type ModelSettings<T extends SupportedModel> = T extends OpenAIModel
             ? XaiProviderSettings
             : T extends OllamaModel
               ? OllamaProviderSettings
-              : never
+              : T extends LMStudioModel
+                ? LMStudioProviderSettings
+                : never
 
 export type OpenProvidersOptions<T extends SupportedModel> = ModelSettings<T>
 
@@ -63,6 +67,36 @@ const createOllamaProvider = () => {
     baseURL: getOllamaBaseURL(),
     apiKey: "ollama", // Ollama doesn't require a real API key
     name: "ollama",
+  })
+}
+
+// Get LM Studio base URL from environment or use default
+const getLMStudioBaseURL = () => {
+  if (typeof window !== "undefined") {
+    // Client-side: use localhost
+    return "http://localhost:1234/v1"
+  }
+
+  // Server-side: check environment variables
+  const envUrl = process.env.LM_STUDIO_BASE_URL
+  if (envUrl) {
+    // If URL already ends with /v1, use as-is
+    if (envUrl.endsWith("/v1")) {
+      return envUrl
+    }
+    // Otherwise append /v1
+    return envUrl.replace(/\/+$/, "") + "/v1"
+  }
+  
+  return "http://localhost:1234/v1"
+}
+
+// Create LM Studio provider instance
+const createLMStudioProvider = () => {
+  return createOpenAI({
+    baseURL: getLMStudioBaseURL(),
+    apiKey: "lm-studio", // LM Studio doesn't require a real API key
+    name: "lm-studio",
   })
 }
 
@@ -153,6 +187,16 @@ export function openproviders<T extends SupportedModel>(
     return ollamaProvider(
       modelId as OllamaModel,
       settings as OllamaProviderSettings
+    )
+  }
+
+  if (provider === "lm-studio") {
+    const lmStudioProvider = createLMStudioProvider()
+    // Extract actual model name from lm-studio:modelname format
+    const actualModelId = modelId.replace("lm-studio:", "")
+    return lmStudioProvider(
+      actualModelId,
+      settings as LMStudioProviderSettings
     )
   }
 

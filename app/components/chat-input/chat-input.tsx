@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { getModelInfo } from "@/lib/models"
 import { ArrowUpIcon, StopIcon } from "@phosphor-icons/react"
-import { useCallback, useMemo } from "react"
+import { useCallback, useMemo, useState, useEffect } from "react"
 import { PromptSystem } from "../suggestions/prompt-system"
 import { ButtonFileUpload } from "./button-file-upload"
 import { ButtonSearch } from "./button-search"
@@ -57,6 +57,35 @@ export function ChatInput({
   const selectModelConfig = getModelInfo(selectedModel)
   const hasSearchSupport = Boolean(selectModelConfig?.webSearch)
   const isOnlyWhitespace = (text: string) => !/[^\s]/.test(text)
+
+  // Dynamic placeholder suggestions
+  const placeholderSuggestions = [
+    "Ask about your health...",
+    "What symptoms are you experiencing?",
+    "How can I help with your wellness?",
+    "Tell me about your health concern...",
+    "What health topic interests you?",
+    "Describe how you're feeling...",
+    "Ask a medical question...",
+    "What would you like to know?",
+    "Share your health goals...",
+    "How can I support your health journey?"
+  ]
+
+  const [currentPlaceholder, setCurrentPlaceholder] = useState(placeholderSuggestions[0])
+
+  useEffect(() => {
+    // Change placeholder every 4 seconds
+    const interval = setInterval(() => {
+      setCurrentPlaceholder(prev => {
+        const currentIndex = placeholderSuggestions.indexOf(prev)
+        const nextIndex = (currentIndex + 1) % placeholderSuggestions.length
+        return placeholderSuggestions[nextIndex]
+      })
+    }, 4000)
+
+    return () => clearInterval(interval)
+  }, [])
 
   const handleSend = useCallback(() => {
     if (isSubmitting) {
@@ -159,7 +188,7 @@ export function ChatInput({
         >
           <FileList files={files} onFileRemove={onFileRemove} />
           <PromptInputTextarea
-            placeholder="Ask Zola"
+            placeholder={currentPlaceholder}
             onKeyDown={handleKeyDown}
             onPaste={handlePaste}
             className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3] sm:text-base md:text-base"

@@ -122,6 +122,10 @@ const MODEL_PROVIDER_MAP: Record<string, Provider> = {
   // Static Ollama models
   "llama3.2:latest": "ollama",
   "qwen2.5-coder:latest": "ollama",
+  
+  // LM Studio models
+  "lm-studio:OpenBioLLM-8B": "lm-studio",
+  "lm-studio:custom": "lm-studio",
 }
 
 // Function to check if a model is likely an Ollama model based on naming patterns
@@ -153,6 +157,10 @@ function isOllamaModel(modelId: string): boolean {
 export function getProviderForModel(model: SupportedModel): Provider {
   if (model.startsWith("openrouter:")) {
     return "openrouter"
+  }
+  
+  if (model.startsWith("lm-studio:")) {
+    return "lm-studio"
   }
 
   // First check the static mapping

@@ -4,7 +4,7 @@ import { Provider } from "./openproviders/types"
 import { createClient } from "./supabase/server"
 
 export type { Provider } from "./openproviders/types"
-export type ProviderWithoutOllama = Exclude<Provider, "ollama">
+export type ProviderWithoutOllama = Exclude<Provider, "ollama" | "lm-studio">
 
 export async function getUserKey(
   userId: string,

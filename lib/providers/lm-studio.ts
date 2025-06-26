@@ -1,5 +1,5 @@
 import { OpenAI } from 'openai';
-import { LLMModel } from '@/lib/models/types';
+import { ModelConfig } from '@/lib/models/types';
 
 /**
  * LM Studio configuration for local medical AI
@@ -16,7 +16,7 @@ export const LM_STUDIO_CONFIG = {
 /**
  * LM Studio models configuration
  */
-export const LM_STUDIO_MODELS: LLMModel[] = [
+export const LM_STUDIO_MODELS: ModelConfig[] = [
   {
     id: 'lm-studio:OpenBioLLM-8B',
     name: 'OpenBioLLM-8B (Local)',
@@ -99,7 +99,7 @@ export async function checkLMStudioHealth(): Promise<{
 /**
  * Get available LM Studio models dynamically
  */
-export async function getLMStudioModels(): Promise<LLMModel[]> {
+export async function getLMStudioModels(): Promise<ModelConfig[]> {
   try {
     const health = await checkLMStudioHealth();
     
@@ -108,7 +108,7 @@ export async function getLMStudioModels(): Promise<LLMModel[]> {
     }
 
     // Map discovered models to LLMModel format
-    const dynamicModels: LLMModel[] = health.models.map((modelId: string) => ({
+    const dynamicModels: ModelConfig[] = health.models.map((modelId: string) => ({
       id: `lm-studio:${modelId}`,
       name: `${modelId} (Local)`,
       provider: 'lm-studio',

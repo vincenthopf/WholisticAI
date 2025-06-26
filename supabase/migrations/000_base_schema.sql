@@ -46,7 +46,6 @@ CREATE TABLE IF NOT EXISTS chats (
   system_prompt TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
-  public BOOLEAN DEFAULT FALSE NOT NULL,
   CONSTRAINT chats_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   CONSTRAINT chats_project_id_fkey FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
 );
@@ -79,14 +78,6 @@ CREATE TABLE IF NOT EXISTS chat_attachments (
   CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Feedback table
-CREATE TABLE IF NOT EXISTS feedback (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID NOT NULL,
-  message TEXT NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  CONSTRAINT feedback_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
 
 -- User keys table for BYOK (Bring Your Own Key) integration
 CREATE TABLE IF NOT EXISTS user_keys (
@@ -105,7 +96,6 @@ ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE chats ENABLE ROW LEVEL SECURITY;
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE chat_attachments ENABLE ROW LEVEL SECURITY;
-ALTER TABLE feedback ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_keys ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for users table
@@ -133,7 +123,7 @@ CREATE POLICY "Users can delete their own projects" ON projects
 
 -- RLS Policies for chats table
 CREATE POLICY "Users can view their own chats" ON chats
-  FOR SELECT USING (auth.uid() = user_id OR public = true);
+  FOR SELECT USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can create their own chats" ON chats
   FOR INSERT WITH CHECK (auth.uid() = user_id);
@@ -150,7 +140,7 @@ CREATE POLICY "Users can view messages from their chats" ON messages
     EXISTS (
       SELECT 1 FROM chats 
       WHERE chats.id = messages.chat_id 
-      AND (chats.user_id = auth.uid() OR chats.public = true)
+      AND chats.user_id = auth.uid()
     )
   );
 
@@ -173,12 +163,6 @@ CREATE POLICY "Users can upload attachments to their chats" ON chat_attachments
 CREATE POLICY "Users can delete their own attachments" ON chat_attachments
   FOR DELETE USING (auth.uid() = user_id);
 
--- RLS Policies for feedback table
-CREATE POLICY "Users can create feedback" ON feedback
-  FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can view their own feedback" ON feedback
-  FOR SELECT USING (auth.uid() = user_id);
 
 -- RLS Policies for user_keys table
 CREATE POLICY "Users can manage their own API keys" ON user_keys

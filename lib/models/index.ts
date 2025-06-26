@@ -13,7 +13,7 @@ import { ModelConfig } from "./types"
 
 // Static models (always available)
 const STATIC_MODELS: ModelConfig[] = [
-  ...lmStudioModels, // Local medical models first
+  ...lmStudioModels, // Common LM Studio models for fallback
   ...openaiModels,
   ...mistralModels,
   ...deepseekModels,

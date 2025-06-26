@@ -114,12 +114,10 @@ export type XaiModel =
 
 export type OpenRouterModel =
   | "openrouter:deepseek/deepseek-r1:free"
-  | "openrouter:anthropic/claude-3.7-sonnet:thinking"
-  | "openrouter:google/gemini-2.5-pro-preview"
+  | "openrouter:anthropic/claude-sonnet-4-20250128"
+  | "openrouter:meta-llama/llama-3.3-8b-instruct:free"
   | "openrouter:openai/gpt-4.1"
-  | "openrouter:openai/o4-mini"
-  | "openrouter:x-ai/grok-3-mini-beta"
-  | "openrouter:google/gemini-2.5-flash-preview-05-20"
+  | "openrouter:google/gemini-2.5-pro-preview"
 
 // Static Ollama models for type safety
 export type StaticOllamaModel = "llama3.2:latest" | "qwen2.5-coder:latest"

@@ -3,10 +3,9 @@
 import { Button } from "@/components/ui/button"
 import { PopoverContent } from "@/components/ui/popover"
 import Image from "next/image"
-import React, { useState } from "react"
+import React from "react"
 import Link from "next/link"
 import { APP_NAME } from "../../../lib/config"
-import { createClient } from "../../../lib/supabase/client"
 import { isSupabaseEnabled } from "../../../lib/supabase/config"
 
 export function PopoverContentAuth() {

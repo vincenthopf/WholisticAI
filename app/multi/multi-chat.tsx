@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils"
 import { Message as MessageType } from "@ai-sdk/react"
 import { AnimatePresence, motion } from "motion/react"
 import { useCallback, useEffect, useMemo, useState } from "react"
-// import { mockMessageGroups } from "./mock-data"
 import { MultiChatInput } from "./multi-chat-input"
 import { useMultiChat } from "./use-multi-chat"
 

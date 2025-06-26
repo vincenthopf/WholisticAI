@@ -66,8 +66,7 @@ export function ToolInvocation({
     <div className="mb-10">
       <div className="border-border flex flex-col gap-0 overflow-hidden rounded-md border">
         <button
-          onClick={(e) => {
-            e.preventDefault()
+          onClick={() => {
             setIsExpanded(!isExpanded)
           }}
           type="button"
@@ -374,8 +373,7 @@ function SingleToolCard({
       )}
     >
       <button
-        onClick={(e) => {
-          e.preventDefault()
+        onClick={() => {
           setIsExpanded(!isExpanded)
         }}
         type="button"

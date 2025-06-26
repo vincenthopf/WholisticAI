@@ -103,7 +103,6 @@ export function SettingsContent({
 
             <TabsContent value="models" className="px-6">
               <ModelsSettings />
-              {/* <ModelVisibilitySettings /> */}
             </TabsContent>
 
           </div>
@@ -164,7 +163,6 @@ export function SettingsContent({
 
               <TabsContent value="models" className="mt-0 space-y-6">
                 <ModelsSettings />
-                {/* <ModelVisibilitySettings /> */}
               </TabsContent>
 
             </div>

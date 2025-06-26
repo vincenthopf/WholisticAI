@@ -83,7 +83,5 @@ export async function saveFinalAssistantMessage(
   if (error) {
     console.error("Error saving final assistant message:", error)
     throw new Error(`Failed to save assistant message: ${error.message}`)
-  } else {
-    console.log("Assistant message saved successfully (merged).")
   }
 }

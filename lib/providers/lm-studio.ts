@@ -19,34 +19,29 @@ export const LM_STUDIO_CONFIG = {
 export const LM_STUDIO_MODELS: ModelConfig[] = [
   {
     id: 'lm-studio:OpenBioLLM-8B',
-    name: 'OpenBioLLM-8B (Local)',
+    name: 'OpenBioLLM-8B',
     provider: 'lm-studio',
+    providerId: 'lm-studio',
+    baseProviderId: 'lm-studio',
     description: 'Medical-focused language model running locally via LM Studio',
     contextWindow: 8192,
-    maxTokens: 2048,
     inputCost: 0,
     outputCost: 0,
     tags: ['medical', 'local', 'open-source', 'private'],
-    isNew: true,
-    tier: 'free',
-    supportsStreaming: true,
-    supportsTools: false,
-    supportedFeatures: ['chat', 'medical'],
+    icon: 'lm-studio',
   },
   {
     id: 'lm-studio:custom',
-    name: 'Custom Model (Local)',
+    name: 'Custom Model',
     provider: 'lm-studio',
+    providerId: 'lm-studio',
+    baseProviderId: 'lm-studio',
     description: 'Any custom model loaded in LM Studio',
     contextWindow: 4096,
-    maxTokens: 2048,
     inputCost: 0,
     outputCost: 0,
     tags: ['local', 'custom', 'private'],
-    tier: 'free',
-    supportsStreaming: true,
-    supportsTools: false,
-    supportedFeatures: ['chat'],
+    icon: 'lm-studio',
   }
 ];
 
@@ -110,18 +105,16 @@ export async function getLMStudioModels(): Promise<ModelConfig[]> {
     // Map discovered models to LLMModel format
     const dynamicModels: ModelConfig[] = health.models.map((modelId: string) => ({
       id: `lm-studio:${modelId}`,
-      name: `${modelId} (Local)`,
+      name: modelId,
       provider: 'lm-studio',
-      description: `Local model ${modelId} running via LM Studio`,
+      providerId: 'lm-studio',
+      baseProviderId: 'lm-studio',
+      description: `${modelId} running locally via LM Studio`,
       contextWindow: 4096, // Default, can be overridden
-      maxTokens: 2048,
       inputCost: 0,
       outputCost: 0,
       tags: ['local', 'private'],
-      tier: 'free',
-      supportsStreaming: true,
-      supportsTools: false,
-      supportedFeatures: ['chat'],
+      icon: 'lm-studio',
     }));
 
     // Merge with predefined models, avoiding duplicates

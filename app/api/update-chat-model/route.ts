@@ -14,7 +14,6 @@ export async function POST(request: Request) {
 
     // If Supabase is not available, we still return success
     if (!supabase) {
-      console.log("Supabase not enabled, skipping DB update")
       return new Response(JSON.stringify({ success: true }), { status: 200 })
     }
 

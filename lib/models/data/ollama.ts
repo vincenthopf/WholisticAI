@@ -96,12 +96,12 @@ async function detectOllamaModels(): Promise<ModelConfig[]> {
 
       return {
         id: modelName,
-        name: formatModelName(modelName),
+        name: modelName,
         provider: provider,
         providerId: "ollama",
         baseProviderId: "ollama",
         modelFamily: family,
-        description: `${formatModelName(modelName)} running locally via Ollama (${sizeInGB}GB)`,
+        description: `${modelName} running locally via Ollama (${sizeInGB}GB)`,
         tags: tags,
         contextWindow: contextWindow,
         inputCost: 0.0,
@@ -117,6 +117,7 @@ async function detectOllamaModels(): Promise<ModelConfig[]> {
         website: "https://ollama.com",
         apiDocs: "https://github.com/ollama/ollama/blob/main/docs/api.md",
         modelPage: `https://ollama.com/library/${modelName.split(":")[0]}`,
+        icon: "ollama",
         apiSdk: (apiKey?: string) => openproviders(modelName as string, undefined, apiKey),
       }
     })
@@ -265,14 +266,6 @@ function estimateIntelligence(
   return "High"
 }
 
-function formatModelName(modelName: string): string {
-  // Convert model name to a more readable format
-  return modelName
-    .split(":")[0] // Remove tag part
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ")
-}
 
 // Static fallback models for when Ollama is not available
 const staticOllamaModels: ModelConfig[] = [
@@ -299,6 +292,7 @@ const staticOllamaModels: ModelConfig[] = [
     website: "https://ollama.com",
     apiDocs: "https://github.com/ollama/ollama/blob/main/docs/api.md",
     modelPage: "https://ollama.com/library/llama3.2",
+    icon: "ollama",
     apiSdk: (apiKey?: string) => openproviders("llama3.2:latest" as string, undefined, apiKey),
   },
   {
@@ -325,6 +319,7 @@ const staticOllamaModels: ModelConfig[] = [
     website: "https://ollama.com",
     apiDocs: "https://github.com/ollama/ollama/blob/main/docs/api.md",
     modelPage: "https://ollama.com/library/qwen2.5-coder",
+    icon: "ollama",
     apiSdk: (apiKey?: string) => openproviders("qwen2.5-coder:latest" as string, undefined, apiKey),
   },
 ]
@@ -335,12 +330,7 @@ export async function getOllamaModels(): Promise<ModelConfig[]> {
 
   // If no models detected and Ollama is enabled, return static fallback models
   if (detectedModels.length === 0 && shouldEnableOllama()) {
-    console.info("Using static Ollama models as fallback")
     return staticOllamaModels
-  }
-
-  if (detectedModels.length > 0) {
-    console.info(`Detected ${detectedModels.length} Ollama models`)
   }
 
   return detectedModels

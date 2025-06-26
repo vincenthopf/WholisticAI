@@ -2,6 +2,7 @@ import { useBreakpoint } from "@/app/hooks/use-breakpoint"
 import useClickOutside from "@/app/hooks/use-click-outside"
 import { useChats } from "@/lib/chat-store/chats/provider"
 import { Chat } from "@/lib/chat-store/types"
+import { getModelInfo } from "@/lib/models"
 import { cn } from "@/lib/utils"
 import { Check, X } from "@phosphor-icons/react"
 import Link from "next/link"
@@ -124,6 +125,20 @@ export function SidebarItem({ chat, currentChatId }: SidebarItemProps) {
     [chat.title]
   )
 
+  const modelInfo = useMemo(
+    () => chat.model ? getModelInfo(chat.model) : null,
+    [chat.model]
+  )
+
+  const modelDisplayName = useMemo(
+    () => {
+      if (!modelInfo) return null
+      // Use the original model name without modification
+      return modelInfo.name
+    },
+    [modelInfo]
+  )
+
   const containerClassName = useMemo(
     () =>
       cn(
@@ -183,11 +198,21 @@ export function SidebarItem({ chat, currentChatId }: SidebarItemProps) {
             prefetch
             onClick={handleLinkClick}
           >
-            <div
-              className="text-primary relative line-clamp-1 mask-r-from-80% mask-r-to-85% px-2 py-2 text-sm text-ellipsis whitespace-nowrap"
-              title={displayTitle}
-            >
-              {displayTitle}
+            <div className="relative mask-r-from-80% mask-r-to-85% px-2 py-2">
+              <div
+                className="text-primary line-clamp-1 text-sm text-ellipsis whitespace-nowrap"
+                title={displayTitle}
+              >
+                {displayTitle}
+              </div>
+              {modelDisplayName && (
+                <div
+                  className="text-muted-foreground line-clamp-1 text-xs text-ellipsis whitespace-nowrap"
+                  title={`Model: ${modelDisplayName}`}
+                >
+                  {modelDisplayName}
+                </div>
+              )}
             </div>
           </Link>
 

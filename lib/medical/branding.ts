@@ -135,6 +135,6 @@ export function getEmergencyNumber(countryCode?: string): string {
   if (!countryCode) return MEDICAL_BRANDING.emergency.numbers.default;
   
   const code = countryCode.toLowerCase();
-  return MEDICAL_BRANDING.emergency.numbers[code] || 
+  return MEDICAL_BRANDING.emergency.numbers[code as keyof typeof MEDICAL_BRANDING.emergency.numbers] || 
          MEDICAL_BRANDING.emergency.numbers.default;
 }

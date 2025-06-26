@@ -3,6 +3,7 @@ import { toast } from "@/components/ui/toast"
 import { checkRateLimits } from "@/lib/api"
 import type { Chats } from "@/lib/chat-store/types"
 import { REMAINING_QUERY_ALERT_THRESHOLD } from "@/lib/config"
+import { generateQuickTitle } from "@/lib/chat-title-generator"
 import { Message } from "@ai-sdk/react"
 import { useCallback } from "react"
 
@@ -84,9 +85,12 @@ export function useChatOperations({
 
     if (messages.length === 0) {
       try {
+        // Generate an intelligent title based on the user's input
+        const chatTitle = generateQuickTitle(input)
+        
         const newChat = await createNewChat(
           userId,
-          input,
+          chatTitle,
           selectedModel,
           isAuthenticated,
           systemPrompt

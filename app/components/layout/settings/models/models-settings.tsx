@@ -112,7 +112,7 @@ export function ModelsSettings() {
   }
 
   const getProviderIcon = (model: ModelConfig) => {
-    const provider = PROVIDERS.find((p) => p.id === model.baseProviderId)
+    const provider = PROVIDERS.find((p) => p.id === model.icon)
     return provider?.icon
   }
 

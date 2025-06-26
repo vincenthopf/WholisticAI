@@ -147,7 +147,7 @@ export type ApiError = Error & {
  * @returns Structured error with status code and error code
  */
 export function handleStreamError(err: unknown): ApiError {
-  console.error("🛑 streamText error:", err)
+  console.error("streamText error:", err)
 
   // Extract error details from the AI SDK error
   const aiError = (err as { error?: any })?.error

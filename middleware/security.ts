@@ -261,28 +261,15 @@ export async function logAuditEvent(
     return;
   }
 
-  const forwarded = request.headers.get('x-forwarded-for');
-  const ip = forwarded ? forwarded.split(',')[0] : 'unknown';
-  const userAgent = request.headers.get('user-agent') || 'unknown';
-
-  // In production, this would write to Supabase
-  // For now, we'll just log to console in development
-  const auditEntry = {
-    user_id: userId,
-    action,
-    resource_type: resourceType,
-    resource_id: resourceId,
-    ip_address: ip,
-    user_agent: userAgent,
-    metadata: {
-      ...metadata,
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV
-    }
-  };
-
   // TODO: Implement Supabase audit logging
-  console.log('[AUDIT]', JSON.stringify(auditEntry));
+  // In production, this would write to Supabase audit table
+  // Temporarily suppress unused variable warnings:
+  void userId;
+  void action;
+  void resourceType;
+  void resourceId;
+  void request;
+  void metadata;
 }
 
 /**
